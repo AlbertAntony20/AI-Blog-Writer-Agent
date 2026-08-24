@@ -1,0 +1,10 @@
+**Topic:** *A Virtual Stroll Through Kyoto's Autumn Foliage Spots*  
+**Outline:**
+- **Title:** Kyoto's Golden Hour: Top 5 Spots for Autumn Leaves  
+- **Introduction:** 2–3 sentences on Kyoto's fall fame and why travelers seek it this time of year.  
+- **Section 1:** Eikan‑do Temple – brief history + peak‑color tip.  
+- **Section 2:** Philosopher's Path – walking pace, photography note, and seasonal snack stop.  
+- **Section 3:** Arashiyama Bamboo Grove transition – how the light shifts and why it pairs well with maple leaves.  
+- **Fun fact:** The Japanese tradition of *momijigari* (autumn leaf‑hunting) dates back to the Heian period and was once an aristocratic pastime.  
+- **Conclusion:** Wrap‑up inviting readers to plan a visit, with a reminder about evening chill.  
+- **Target:** ~300 words, Markdown format (title, intro, sections, conclusion, fun fact).  
