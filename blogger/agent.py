@@ -25,9 +25,13 @@ def exit_loop(tool_context: ToolContext) -> dict:
    """Call this tool ONLY when validation passes, to end the current
    refinement loop immediately instead of burning remaining iterations."""
    tool_context.actions.escalate = True
-   # Skip the extra LLM call ADK would otherwise make to summarize this
-   # tool's result — there's nothing to summarize, and it costs a call.
-   tool_context.actions.skip_summarization = True
+   # NOTE: do NOT set skip_summarization here. AgentTool (which wraps this
+   # LoopAgent for the root agent) returns whatever text was in the LAST
+   # event of the run, and a function_response event carries no extractable
+   # text. Suppressing the follow-up model turn left that response empty,
+   # so the root agent saw the writer/planner tool "return nothing." This
+   # costs one extra LLM call per successful stage vs. the ideal, but it's
+   # required for the tool response to carry any text at all.
    return {}
 
 
