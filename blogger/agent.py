@@ -6,6 +6,7 @@ import datetime
 from dotenv import load_dotenv
 from google.adk.agents import Agent, LoopAgent
 from google.adk.tools import agent_tool
+from google.adk.tools.tool_context import ToolContext
 from google.adk.models.lite_llm import LiteLlm
 
 # ── env/config ───────────────────────────────────────────────────────────────
@@ -17,6 +18,18 @@ MODEL = LiteLlm(
       "nvidia_nim/nvidia/nemotron-3.5-lightning-30b-a3b",
    )
 )
+
+
+# ── Shared tool: deterministic loop exit ────────────────────────────────────
+def exit_loop(tool_context: ToolContext) -> dict:
+   """Call this tool ONLY when validation passes, to end the current
+   refinement loop immediately instead of burning remaining iterations."""
+   tool_context.actions.escalate = True
+   # Skip the extra LLM call ADK would otherwise make to summarize this
+   # tool's result — there's nothing to summarize, and it costs a call.
+   tool_context.actions.skip_summarization = True
+   return {}
+
 
 # ── Sub-Agent: Planner ───────────────────────────────────────────────────────
 blog_planner = Agent(
@@ -43,10 +56,19 @@ class OutlineValidationChecker(Agent):
            model=MODEL,
            description="Validates that the outline is usable.",
            instruction="""
-Check the outline in state `blog_outline`. If it has a title, intro, 4–6 sections, and a conclusion, respond exactly "ok".
-Otherwise respond exactly "retry" and list missing pieces.
+Check the outline in state `blog_outline`.
+
+If it has a title, intro, 4–6 sections, and a conclusion:
+- Call the `exit_loop` tool immediately, with no other text.
+
+Otherwise:
+- Do NOT call `exit_loop`.
+- Respond with the exact word "retry" followed by a list of the
+  specific pieces that are missing, so the planner can fix them
+  on the next attempt.
 """,
-           output_key="validation_result",
+           tools=[exit_loop],
+           output_key="outline_validation_result",
        )
 
 robust_blog_planner = LoopAgent(
@@ -81,10 +103,18 @@ class BlogPostValidationChecker(Agent):
            model=MODEL,
            description="Validates the final post.",
            instruction="""
-Check `blog_post` for: intro, clear sections matching the outline, conclusion, and technical clarity.
-If passes, respond "ok". Else respond "retry" with the specific fixes.
+Check `blog_post` for: intro, clear sections matching the outline, conclusion,
+and technical clarity.
+
+If it passes:
+- Call the `exit_loop` tool immediately, with no other text.
+
+Otherwise:
+- Do NOT call `exit_loop`.
+- Respond with the exact word "retry" followed by the specific fixes needed.
 """,
-           output_key="validation_result",
+           tools=[exit_loop],
+           output_key="post_validation_result",
        )
 
 robust_blog_writer = LoopAgent(
