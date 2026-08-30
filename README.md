@@ -22,11 +22,11 @@ Which of these is the ‘right’ one? It depends on the problem. For simple, pr
 
 ## How to Run
 
-When you clone the parent `awesome-ai-agents` repository, follow these steps to run this specific agent:
+When you clone the parent `AI-Blog-Writer-Agent` repository, follow these steps to run this specific agent:
 
 ### 1. Navigate to the Project Directory
 ```bash
-cd build-ai-agent-google-adk
+cd AI-Blog-Writer-Agent
 ```
 
 ### 2. Setup Environment Variables
